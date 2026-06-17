@@ -1,0 +1,178 @@
+# Claude Code — Built-in Analytics Reference
+
+> A structured reference of what Anthropic natively provides for measuring Claude Code impact at the organization level, including metrics, access paths, and documentation links.
+
+---
+
+## 1. Analytics Dashboard (UI)
+
+The primary no-code interface for org-level visibility.
+
+| Detail | Info |
+|---|---|
+| **Access URL** | [claude.ai/analytics/claude-code](https://claude.ai/analytics/claude-code) |
+| **Who can access** | Team/Enterprise: Owners, Primary Owners, Admins |
+| **Official docs** | [Track team usage with analytics](https://code.claude.com/docs/en/analytics) |
+| **Help article** | [Claude Code usage analytics](https://support.claude.com/en/articles/12157520-claude-code-usage-analytics) |
+
+### What it shows
+
+#### Usage Metrics (available on Team + Enterprise, no extra setup)
+
+| Metric | What it measures | Unit |
+|---|---|---|
+| Lines of code accepted | Total lines of AI-generated code incorporated by the team | Lines / day |
+| Suggestion accept rate | % of Claude Code suggestions accepted across the org | Percentage |
+| Daily active users | Number of developers actively using Claude Code | Users / day |
+| Active sessions | Total Claude Code sessions per day | Sessions / day |
+| Lines accepted over time | Daily trend of accepted code lines | Time series |
+| Per-user breakdown | Individual lines accepted + email, exportable as CSV | Per user / month |
+
+> **Data reset:** Usage metrics reset at the start of each calendar month. Historical data available at daily granularity.
+
+---
+
+#### Contribution Metrics (public beta — requires GitHub integration)
+
+| Metric | What it measures | Level |
+|---|---|---|
+| PRs merged with Claude Code | PRs where Claude Code was used in the session | Org + User |
+| PRs merged without Claude Code | Baseline PRs with no Claude Code activity | Org + User |
+| Lines of code committed with Claude Code | Code shipped where Claude Code assisted | Org + User |
+| Lines of code committed without Claude Code | Code shipped without AI assistance | Org + User |
+| PRs opened per user | Individual PR activity across the team | Per user |
+
+> **How it works:** Contribution metrics correlate Claude Code session activity with GitHub commits and PRs. Requires installing the [Claude GitHub App](https://github.com/apps/claude) on your org's GitHub account.
+
+**Setup steps:**
+1. Install the [Claude GitHub App](https://github.com/apps/claude) (GitHub admin required)
+2. Go to [Admin Settings > Claude Code](https://claude.ai/admin-settings/claude-code) as Owner
+3. Enable "Claude Code analytics"
+4. Toggle on "GitHub analytics" and select your GitHub org(s)
+5. Allow up to 24 hours for data to appear
+
+**Important limitations:**
+- Requires GitHub Cloud (not GitHub Enterprise Server)
+- Not available for orgs with Zero Data Retention enabled
+- Not available for Console/API users — Team and Enterprise only
+
+---
+
+## 2. Analytics APIs (Programmatic Access)
+
+For pulling data into your own dashboards, data warehouses, or BI tools.
+
+Anthropic provides **two separate APIs** — which one you need depends on your plan:
+
+| API | Plan | Key type | What it covers |
+|---|---|---|---|
+| **Claude Code Analytics API** | Claude Platform (API/Console) | Admin API key (`sk-ant-admin01-...`) | Daily per-user Claude Code productivity metrics |
+| **Claude Enterprise Analytics API** | Claude Enterprise (claude.ai) | Analytics API key (created in claude.ai) | Org-wide engagement, adoption, cost across all Claude products |
+
+> These key types are **not interchangeable** — an Admin API key cannot call the Enterprise Analytics API and vice versa.
+
+---
+
+### 2a. Claude Code Analytics API
+
+| Detail | Info |
+|---|---|
+| **Endpoint** | `GET https://api.anthropic.com/v1/organizations/usage_report/claude_code` |
+| **Key type** | Admin API key — created at [Console > Settings > Admin keys](https://platform.claude.com/settings/admin-keys) |
+| **Who can create key** | Organization Admin role |
+| **Cost** | Free to use |
+| **Docs** | [Claude Code Analytics API](https://platform.claude.com/docs/en/manage-claude/claude-code-analytics-api) |
+
+**Metrics returned (daily, per user):**
+
+| Field | Description |
+|---|---|
+| Sessions | Number of Claude Code sessions for the user on that day |
+| Lines of code | Lines generated / accepted |
+| Commits | Commits made during Claude Code sessions |
+| Pull requests | PRs opened during Claude Code sessions |
+| Tool acceptance | Rate at which tool suggestions were accepted |
+| Token usage | Tokens consumed per model |
+| Estimated cost | Cost estimate by model |
+
+**Aggregation:** Daily only. For real-time, use the [OpenTelemetry integration](https://docs.anthropic.com).
+
+---
+
+### 2b. Claude Enterprise Analytics API
+
+| Detail | Info |
+|---|---|
+| **Base URL** | `https://api.anthropic.com/v1/organizations/analytics/` |
+| **Key type** | Analytics API key — created at [claude.ai > Org settings > API](https://claude.ai/admin-settings/api-access) |
+| **Who can create key** | Primary Owner |
+| **Docs** | [Analytics APIs overview](https://platform.claude.com/docs/en/manage-claude/analytics-api) |
+| **Help article** | [Get started with the Claude Enterprise Analytics API](https://support.claude.com/en/articles/13694757-get-started-with-the-claude-enterprise-analytics-api) |
+
+**What it covers:**
+
+| Data type | Granularity |
+|---|---|
+| User activity | Per-user daily metrics across chat, Claude Code, projects, files, artifacts |
+| Active users | Org-level daily, weekly, monthly active users + seat counts |
+| Claude Code activity | Sessions, commits, PRs, lines of code, tool actions |
+| Project & connector usage | Adoption breakdowns for chat projects, skills, connectors |
+| Cost & token reports | Per-user and org-level token usage and cost over time (usage-based plans) |
+
+---
+
+## 3. Analytics Chat (New)
+
+Ask Claude natural language questions about your own usage data.
+
+| Detail | Info |
+|---|---|
+| **What it is** | Chat interface that queries your org's analytics data |
+| **Help article** | [Use analytics chat to ask Claude about usage](https://support.claude.com/en/articles/14729354-use-analytics-chat-to-ask-claude-about-usage) |
+
+Example queries: *"Which teams have the highest acceptance rate this month?"*, *"Show me PR contribution trends for the last 4 weeks."*
+
+---
+
+## 4. Key Limitations to Know
+
+| Limitation | Detail |
+|---|---|
+| Scope | Only covers users within your claude.ai org. Console/API or third-party integration usage not included |
+| Zero Data Retention | Contribution metrics unavailable if ZDR is enabled |
+| GitHub requirement | Contribution metrics require GitHub Cloud, not GitHub Enterprise Server |
+| Data delay | Enterprise Analytics API has a 3-day data delay. Not suitable for real-time monitoring |
+| Historical data | Enterprise Analytics API data available from January 1, 2026 onwards |
+| Individual plans | Usage analytics not available on individual Pro or Max plans |
+| Min version | Users must be on Claude Code v2.0.28+ to appear in analytics |
+
+---
+
+## 5. Quick Reference — Where to Go
+
+| Goal | Where to go |
+|---|---|
+| See org-level dashboard | [claude.ai/analytics/claude-code](https://claude.ai/analytics/claude-code) |
+| Set up GitHub contribution metrics | [claude.ai/admin-settings/claude-code](https://claude.ai/admin-settings/claude-code) |
+| Pull data via API (Platform/Console) | [platform.claude.com/docs/en/manage-claude/claude-code-analytics-api](https://platform.claude.com/docs/en/manage-claude/claude-code-analytics-api) |
+| Pull data via API (Enterprise) | [platform.claude.com/docs/en/manage-claude/analytics-api](https://platform.claude.com/docs/en/manage-claude/analytics-api) |
+| Full analytics docs | [code.claude.com/docs/en/analytics](https://code.claude.com/docs/en/analytics) |
+| Help center | [support.claude.com](https://support.claude.com) |
+
+---
+
+## 6. What Claude Does NOT Provide (You Need to Add)
+
+These are gaps you'll need to cover with your own tooling:
+
+| Gap | Suggested source |
+|---|---|
+| Code churn rate | Git analytics (GitClear, Waydev, custom script) |
+| Defect injection rate | CI/CD pipeline + bug tracker correlation |
+| PR review time delta | GitHub API or engineering analytics tool |
+| Developer experience / satisfaction | Pulse survey (biweekly, 5 questions) |
+| Task-type attribution (debugging vs greenfield) | Ticket tagging discipline in Jira/Linear |
+
+---
+
+*Sources: [Anthropic Help Center](https://support.claude.com), [Claude Code Docs](https://code.claude.com/docs), [Claude API Docs](https://platform.claude.com/docs) — last verified June 2026*
